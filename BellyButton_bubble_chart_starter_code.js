@@ -59,42 +59,73 @@ function buildCharts(sample) {
   // Use d3.json to load and retrieve the samples.json file 
   d3.json("samples.json").then((data) => {
     // Create a variable that holds the samples array. 
+    var samplesArrayAll = data.samples;
 
     // Create a variable that filters the samples for the object with the desired sample number.
+    var resultArray = sampleData.filter(sampleObj => sampleObj.id == sample);
 
     // Create a variable that holds the first sample in the array.
-
+    var result = resultArray[0];
+    
 
     // Create variables that hold the otu_ids, otu_labels, and sample_values.
-
+    var sampleIds = result.otu_ids;
+    var sampleLabels = result.otu_labels;
+    var sampleValues = result.sample_values;
 
     // Create the yticks for the bar chart.
     // Hint: Get the the top 10 otu_ids and map them in descending order  
     // so the otu_ids with the most bacteria are last. 
-
-    var yticks = 
+    var xticks = sampleValues.slice(0,10).reverse();
+    var yticks = sampleIds.slice(0,10).map(ID => "OTU " + ID).reverse();
+    var textdata = sampleLabels.slice(0,10).reverse();
 
     // Create the trace for the bar chart. 
-    var barData = [
-      
-    ];
+    var trace = {
+      x: xticks,
+      y: yticks,
+      type: "bar",
+      text: textdata,
+      orientation: "h"
+    };
+    var barData = [trace];
     // Create the layout for the bar chart. 
     var barLayout = {
-     
+      title: "Top 10 Bacteria Cultures Found"
     };
     // Use Plotly to plot the data with the layout. 
+    Plotly.newPlot("bar", barData ,barLayout);
 
     // 1. Create the trace for the bubble chart.
-    var bubbleData = [
-   
-    ];
+    var trace = {
+      type: "bubble",
+      x: sampleIds,
+      y: sampleValues,
+      text: sampleLabels,
+      mode: "markers",
+      marker: {
+        size: sampleValues,
+        color: sampleIds,
+        colorscale: "Viridis"
+  
+
+      }
+    };
+
+    var bubbleData = [trace];
 
     // 2. Create the layout for the bubble chart.
     var bubbleLayout = {
-      
-    };
+      title: "Bacteria Cultures Per Sample",
+      xaxis: {
+        title: 'OTU ID'
+      },
+      hovermode: "closest",
+      hoverlabel: sampleIds, sampleLabels, sampleValues,
 
+    };
     // 3. Use Plotly to plot the data with the layout.
-    
+    Plotly.newPlot("bubble", bubbleData, bubbleLayout)
+
   });
 }
